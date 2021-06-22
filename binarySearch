@@ -1,0 +1,47 @@
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+long binarySearch(const vector<long> &array, long target);
+
+long binarySearch(const vector<long> &array, long target) {
+    long left = 0, right = array.size() - 1;
+    while (left <= right) {
+        long middle = left + (right - left) / 2;
+        if (target == array[middle]) {
+            return middle;
+        } else if (target > array[middle]) {
+            right = middle - 1;
+        } else {
+            left = middle + 1;
+        }
+    }
+    return -1;
+}
+
+int main() {
+    long firstArrSize;
+    long secondArrSize;
+    // считываем данные
+    cin >> firstArrSize;
+    cin >> secondArrSize;
+    vector<long> firstArray(firstArrSize);
+    vector<long> secondArray(secondArrSize);
+    for (long i = 0; i < firstArrSize; i++) {
+        cin >> firstArray[i];
+    }
+    for (long i = 0; i < secondArrSize; i++) {
+        cin >> secondArray[i];
+    }
+
+    for (long el: secondArray) {
+        if (binarySearch(firstArray, el) == -1) {
+            cout << "NO" << endl;
+        } else {
+            cout << "YES" << endl;
+        }
+    }
+    return 0;
+}
+

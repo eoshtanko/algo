@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+void bubbleSort(vector<int> array, int size);
+
+void bubbleSort(vector<int> array, int size) {
+    int numberOfSwaps = 0;
+    if (size == 0) {
+        cout << endl;
+        cout << numberOfSwaps;
+    }
+    bool isSorted = false;
+    int counter = 0;
+    while (!isSorted) {
+        isSorted = true;
+        for (int i = 0; i < size - 1 - counter; i++) {
+            if (array[i] > array[i + 1]) {
+                swap(array[i], array[i + 1]);
+                numberOfSwaps++;
+                isSorted = false;
+            }
+        }
+        counter++;
+    }
+    for (int el: array) {
+        cout << el << "  ";
+    }
+    cout << endl;
+    cout << numberOfSwaps;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> array(0);
+    // считывем данные
+    int variableForReading;
+    for (int i = 0; i < n; i++) {
+        cin >> variableForReading;
+        array.push_back(variableForReading);
+    }
+    bubbleSort(array, n);
+    return 0;
+}
+
+

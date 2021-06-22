@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+void binaryInsertionSort(vector<int> array);
+
+void binaryInsertionSort(vector<int> array) {
+    int numberOfMove = 0;
+    if (array.empty()) {
+        cout << endl;
+        cout << numberOfMove;
+    }
+    for (int i = 1; i < array.size(); i++) {
+        if (array[i] < array[i - 1]) {
+            int left = 0, right = i - 1;
+            int middle = left + (right - left) / 2;
+            while (left != middle) {
+                if (array[middle] > array[i]) {
+                    right = middle - 1;
+                } else {
+                    left = middle;
+                }
+                middle = left + (right - left) / 2;
+            }
+            if (array[left] < array[i]) {
+                if (array[right] < array[i]) {
+                    left = right + 1;
+                } else {
+                    left = right;
+                }
+            }
+            while (array[left] == array[i]) {
+                left++;
+            }
+            int move = array[i];
+            int k = i;
+            while (k > left) {
+                if (array[k] != array[k - 1]) {
+                    array[k] = array[k - 1];
+                    numberOfMove++;
+                }
+                k = k - 1;
+            }
+            array[left] = move;
+        }
+    }
+    for (int el: array) {
+        cout << el << "  ";
+    }
+    cout << endl;
+    cout << numberOfMove;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> array(0);
+    int variableForReading;
+    for (int i = 0; i < n; i++) {
+        cin >> variableForReading;
+        array.push_back(variableForReading);
+    }
+    binaryInsertionSort(array);
+    return 0;
+}
+
+
