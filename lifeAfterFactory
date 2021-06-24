@@ -1,0 +1,125 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int heap_size;
+
+int left(int i) {
+    return 2 * i + 1;
+}
+
+int right(int i) {
+    return 2 * i + 2;
+}
+
+void heapify(long *numbers, int i, int array_size) {
+    int largest;
+    if (left(i) < heap_size && numbers[left(i)] > numbers[i]) {
+        largest = left(i);
+    } else {
+        largest = i;
+    }
+    if (right(i) < heap_size && numbers[right(i)] > numbers[largest]) {
+        largest = right(i);
+    }
+    if (largest != i) {
+        long temp = numbers[i];
+        numbers[i] = numbers[largest];
+        numbers[largest] = temp;
+        heapify(numbers, largest, array_size);
+    }
+}
+
+void buildHeap(long *numbers, int array_size) {
+    heap_size = array_size;
+    for (int i = array_size / 2 - 1; i >= 0; i--) {
+        heapify(numbers, i, array_size);
+    }
+}
+
+void heapSort(long *numbers, int array_size) {
+    buildHeap(numbers, array_size);
+    for (int i = array_size - 1; i >= 1; i--) {
+        long temp = numbers[i];
+        numbers[i] = numbers[0];
+        numbers[0] = temp;
+        heap_size--;
+        heapify(numbers, 0, array_size);
+    }
+}
+
+int binarySearch(const long *numbers, long target, int array_size, bool searchBeforePoint) {
+    int left = 0, right = array_size - 1;
+    while (true) {
+        int middle = left + (right - left) / 2;
+        if (target == numbers[middle]) {
+            if (searchBeforePoint) {
+                while (numbers[middle] == numbers[middle - 1])
+                    middle--;
+                return middle - 1;
+            } else {
+                while (numbers[middle] == numbers[middle + 1])
+                    middle++;
+                return middle;
+            }
+        } else if (target < numbers[middle]) {
+            right = middle - 1;
+            if (left > right) {
+                return right;
+            }
+        } else {
+            left = middle + 1;
+            if (left > right) {
+                return left - 1;
+            }
+        }
+    }
+}
+
+int main() {
+    long *intervalStarts = nullptr;
+    long *intervalEnds = nullptr;
+    long *visitorsRequests = nullptr;
+    int n;
+    int k;
+
+    cin >> n;
+    intervalStarts = new long[n];
+    intervalEnds = new long[n];
+
+    for (int i = 0; i < n; i++) {
+        cin >> intervalStarts[i] >> intervalEnds[i];
+    }
+
+    cin >> k;
+
+    visitorsRequests = new long[k];
+
+    for (int i = 0; i < k; i++) {
+        cin >> visitorsRequests[i];
+    }
+
+    heapSort(intervalStarts, n);
+    heapSort(intervalEnds, n);
+
+    int startsAfterPoint, endsBeforePoint;
+    for (int j = 0; j < k; j++) {
+
+        // Сколько "начал" правее точки?
+        startsAfterPoint = (n - (binarySearch(intervalStarts, visitorsRequests[j], n, false) + 1));
+
+        // Сколько "концов" левее точки?
+        endsBeforePoint = binarySearch(intervalEnds, visitorsRequests[j], n, true) + 1;
+
+        cout << n - (startsAfterPoint + endsBeforePoint) << "\n";
+    }
+
+    delete[] intervalStarts;
+    delete[] intervalEnds;
+    delete[] visitorsRequests;
+
+    return 0;
+}
+
+

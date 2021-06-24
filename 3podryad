@@ -1,0 +1,88 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+bool checker(int i, int j, char **ary, int n) {
+    bool notAPoint = ary[i][j] != '.';
+    bool twoCrossesAbove = i - 2 >= 0 && (ary[i - 1][j] == 'X' && ary[i - 2][j] == 'X');
+    bool twoCrossesBelow = i + 2 < n && (ary[i + 1][j] == 'X' && ary[i + 2][j] == 'X');
+    bool twoCrossesOnTheRight = j + 2 < n && (ary[i][j + 1] == 'X' && ary[i][j + 2] == 'X');
+    bool twoCrossesOnTheLeft = j - 2 >= 0 && (ary[i][j - 1] == 'X' && ary[i][j - 2] == 'X');
+    bool onTheLeftAndOnTheRight =
+            !(j - 1 < 0 || j + 1 >= n) && (ary[i][j - 1] == 'X' && ary[i][j + 1] == 'X');
+    bool belowAndAbove = !(i - 1 < 0 || i + 1 >= n) && (ary[i - 1][j] == 'X' && ary[i + 1][j] == 'X');
+    bool res = notAPoint && (twoCrossesAbove || twoCrossesBelow
+                || twoCrossesOnTheLeft || twoCrossesOnTheRight
+                || belowAndAbove || onTheLeftAndOnTheRight);
+    return res;
+}
+
+void solver(int n, char **ary, int maxAmountOfZeros) {
+    // Мы решаем задачу диаганализацией.
+    // Однако есть разные способы "наложить" этот патерн на поле.
+    // Если при первой попытке мы превысили допустимое число ноликов
+    // - пробуем другое расположение.
+    for (int method = 0; method < 3; method++) {
+        int amountOfZeroes = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if ((i + j + method) % 3 == 0 && checker(i, j, ary, n)) {
+                    amountOfZeroes++;
+                }
+            }
+        }
+
+        if (amountOfZeroes <= maxAmountOfZeros) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if ((i + j + method) % 3 == 0 && checker(i, j, ary, n)) {
+                        ary[i][j] = '0';
+                    }
+                    cout << ary[i][j];
+                }
+                cout << endl;
+            }
+            return;
+        }
+    }
+}
+
+int main() {
+    int n;
+    int amountOfCrosses = 0;
+    char variableForReading;
+
+    cin >> n;
+
+    char **ary = new char *[n];
+
+    // создаем двумерный массив
+    for (int i = 0; i < n; i++) {
+        ary[i] = new char[n];
+    }
+
+    // считываем данные
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> variableForReading;
+            if (variableForReading == 'X') {
+                amountOfCrosses++;
+            }
+            ary[i][j] = variableForReading;
+        }
+    }
+
+    // решаем задачку
+    solver(n, ary, amountOfCrosses / 3);
+
+    // заботимся о памяти
+    for (int i = 0; i < n; i++) {
+        delete[] ary[i];
+    }
+    delete[] ary;
+
+    return 0;
+}
+
+
