@@ -1,0 +1,155 @@
+#include "ReadWriter.h"
+//iostream, fstream, Student_and_Ski.h включены в ReadWriter.h
+using namespace std;
+
+//Можно создавать любое количество любых вспомогательных методов для решения задачи.
+//Рекомендуется использовать имеющиеся классы Student и Ski для решения задачи.
+
+// Возьмем "опорного" студента.
+// Возьмем "опорные" лыжи(лыжи "опорного" студента).
+// Отсортируем лыжи относительно "опорного" студента.
+// Отсортируем студентов отностительно "опорных лыж.
+void qSortPairs(Student *students, Ski *skis, int n, int in, int ik) {
+    if (in < ik) {
+        int i = in, j = ik;
+        // выбираем "опорного" студента
+        Student pivotStudent = students[i + (j - i) / 2];
+        Ski pivotSki;
+
+        // ищем лыжи для "опорного" студента
+        for (int k = in; k <= ik; k++)
+        {
+            if (compare(pivotStudent, skis[k]) == 0)
+            {
+                pivotSki = skis[k];
+                skis[k] = skis[i + (j - i) / 2];
+                skis[i + (j - i) / 2] = pivotSki;
+                break;
+            }
+        }
+
+        // сортируем лыжи относительного "опорного" студента
+        while (i <= j) {
+            while (compare(pivotStudent, skis[i]) == -1) {
+                i++;
+            }
+            while (compare(pivotStudent, skis[j]) == 1) {
+                j--;
+            }
+            if (i <= j) {
+                Ski temp = skis[i];
+                skis[i] = skis[j];
+                skis[j] = temp;
+                i++;
+                j--;
+            }
+        }
+
+        i = in, j = ik;
+
+        // сортируем студентов относительно "опорных" лыж
+        while (i <= j) {
+            while (compare(students[i], pivotSki) == 1) {
+                i++;
+            }
+            while (compare(students[j], pivotSki) == -1) {
+                j--;
+            }
+            if (i <= j) {
+                Student temp = students[i];
+                students[i] = students[j];
+                students[j] = temp;
+                i++;
+                j--;
+            }
+        }
+
+        if (in < j) {
+            qSortPairs(students, skis, n, in, j);
+        }
+
+        if (ik > i) {
+            qSortPairs(students, skis, n, i, ik);
+        }
+
+    }
+}
+
+//Отсортируем по id
+void qSortId(Student *students, Ski *skis, int n, int in, int ik) {
+    if (in < ik) {
+        int i = in, j = ik;
+        Student pivotStudent = students[i + (j - i) / 2];
+        do {
+            while (students[i].id < pivotStudent.id) {
+                i++;
+            }
+            while (students[j].id > pivotStudent.id) {
+                j--;
+            }
+            if (i <= j) {
+                Student tempStudent = students[i];
+                students[i] = students[j];
+                students[j] = tempStudent;
+
+                Ski tempSki = skis[i];
+                skis[i] = skis[j];
+                skis[j] = tempSki;
+
+                i++;
+                j--;
+            }
+        } while (i <= j);
+        if (in < j) {
+            qSortId(students, skis, n, in, j);
+        }
+        if (ik > i) {
+            qSortId(students, skis, n, i, ik);
+        }
+    }
+}
+
+//Задача - реализовать этот метод.
+//Ответ должен быть упорядочен по возрастанию номеров студентов(!), то есть их id.
+//Ответы должны быть в этих же массивах.
+void findPairs(Student *students, Ski *skis, int n) {
+    // Возьмем "опорного" студента.
+    // Возьмем "опорные" лыжи(лыжи "опорного" студента).
+    // Отсортируем лыжи относительно "опорного" студента.
+    // Отсортируем студентов отностительно "опорных" лыж.
+    // (quick Sort)
+    qSortPairs(students, skis, n, 0, n - 1);
+    //Отсортируем по id
+    qSortId(students, skis, n, 0, n - 1);
+}
+
+int main() {
+    ReadWriter rw;
+
+    Student *students = nullptr;
+    Ski *skis = nullptr;
+    int n;
+
+    //Read n from file
+    n = rw.readInt();
+
+    //Create arrays
+    students = new Student[n];
+    skis = new Ski[n];
+
+    //read Students and Skis from file
+    rw.readStudents(students, n);
+    rw.readSkis(skis, n);
+
+    //Find pairs
+    findPairs(students, skis, n);
+
+    //Write answer to file
+    rw.writeStudentsAndSkis(students, skis, n);
+
+    delete[] students;
+    delete[] skis;
+    return 0;
+}
+
+

@@ -1,0 +1,116 @@
+#include <iostream>
+#include <fstream>
+
+#pragma once
+
+// Класс для работы с вводом/выводом
+class ReadWriter {
+private:
+
+    std::fstream fin;
+    std::fstream fout;
+
+public:
+
+    ~ReadWriter() {
+        fin.close();
+        fout.close();
+    }
+
+    ReadWriter() {
+        fin.open("input.txt", std::ios::in);
+        fout.open("output.txt", std::ios::out);
+    }
+
+    int readInt() {
+        if (!fin.is_open())
+            throw std::ios_base::failure("file not open");
+
+        int n = 0;
+        fin >> n;
+        return n;
+    }
+
+    //This method only fill array. You should create it before call this method.
+    void readArray(int *arr, int length) {
+        if (!fin.is_open())
+            throw std::ios_base::failure("file not open");
+
+        for (int i = 0; i < length; i++)
+            fin >> arr[i];
+    }
+
+    void writeInt(int n) {
+        if (!fout.is_open())
+            throw std::ios_base::failure("file not open");
+        fout << n << "\n";
+    }
+
+    void writeArray(int *arr, int n) {
+        if (!fout.is_open())
+            throw std::ios_base::failure("file not open");
+        for (int i = 0; i < n; i++)
+            fout << arr[i] << " ";
+    }
+};
+
+int numberOfRecursiveCalls = 0;
+
+int lomuto(int *numbers, int lo, int hi) {
+    int pivot = numbers[hi];
+    int i = lo;
+    for (int j = lo; j <= hi - 1; j++) {
+        if (numbers[j] <= pivot) {
+            int temp = numbers[i];
+            numbers[i] = numbers[j];
+            numbers[j] = temp;
+            i++;
+        }
+    }
+    int temp = numbers[i];
+    numbers[i] = numbers[hi];
+    numbers[hi] = temp;
+    return i;
+}
+
+void qSort(int *numbers, int array_size, int lo, int hi) {
+    if (lo < hi) {
+        int p = lomuto(numbers, lo, hi);
+        if (p > 0) {
+            if (lo < p - 1) {
+                numberOfRecursiveCalls++;
+                qSort(numbers, array_size, lo, p - 1);
+            }
+        }
+        if (p + 1 < hi) {
+            numberOfRecursiveCalls++;
+            qSort(numbers, array_size, p + 1, hi);
+        }
+    }
+}
+
+int main() {
+    ReadWriter rw;
+
+    int *brr = nullptr;
+    int n;
+
+    //Ввод из файла
+    n = rw.readInt();
+
+    brr = new int[n];
+    rw.readArray(brr, n);
+
+    qSort(brr, n, 0, n - 1);
+
+    rw.writeInt(numberOfRecursiveCalls);
+
+    rw.writeArray(brr, n);
+
+    //освобождаем память
+    delete[] brr;
+
+    return 0;
+}
+
+

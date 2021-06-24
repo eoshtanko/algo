@@ -1,0 +1,213 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void qSort(int *numbers, int array_size, int in, int ik) {
+    if (in < ik) {
+        int i = in, j = ik;
+        int x = numbers[i + (j - i) / 2];
+        do {
+            while (numbers[i] < x) {
+                i++;
+            }
+            while (numbers[j] > x) {
+                j--;
+            }
+            if (i <= j) {
+                int temp = numbers[i];
+                numbers[i] = numbers[j];
+                numbers[j] = temp;
+                i++;
+                j--;
+            }
+        } while (i <= j);
+        if (in < j) {
+            qSort(numbers, array_size, in, j);
+        }
+        if (ik > i) {
+            qSort(numbers, array_size, i, ik);
+        }
+    }
+}
+
+double checker(double a, double b, double c) {
+    return (double)((a - b) * (a - b)) + (double)((b - c) * (b - c)) + (double)((a - c) * (a - c));
+}
+
+// Необходимо вернуть вектор ans, который содержит три элемента:
+// ans[0] - вес найденного самоцвета красного цвета
+// ans[1] - вес найденного самоцвета зеленого цвета
+// ans[2] - вес найденного самоцвета синего цвета
+int *solve(int nr, int ng, int nb, int *r, int *g, int *b) {
+    int *ans = new int[3];
+    qSort(r, nr, 0, nr - 1);
+    qSort(g, ng, 0, ng - 1);
+    qSort(b, nb, 0, nb - 1);
+
+    int indexRed = 0, indexGreen = 0, indexBlue = 0;
+    double smallest = 9223372036854775807.0;
+    while (true) {
+
+        if (smallest > checker(r[indexRed], g[indexGreen], b[indexBlue])) {
+            smallest = checker(r[indexRed], g[indexGreen], b[indexBlue]);
+            ans[0] = r[indexRed];
+            ans[1] = g[indexGreen];
+            ans[2] = b[indexBlue];
+        }
+
+        if ((b[indexBlue] == r[indexRed]) && (r[indexRed] == g[indexGreen])) {
+            ans[0] = r[indexRed];
+            ans[1] = g[indexGreen];
+            ans[2] = b[indexBlue];
+            return ans;
+
+        } else if (r[indexRed] <= g[indexGreen] && r[indexRed] <= b[indexBlue] && g[indexGreen] <= b[indexBlue]) {
+            if (indexRed == nr - 1 && indexGreen == ng - 1) {
+                break;
+            }
+            if (indexRed < nr - 1 && (r[indexRed + 1] <= g[indexGreen] || r[indexRed + 1] <= b[indexBlue])) {
+                indexRed++;
+            } else if (indexGreen < ng - 1 && (g[indexGreen + 1] <= b[indexBlue])) {
+                indexGreen++;
+            } else if (indexRed < nr - 1 && indexGreen < ng - 1 && r[indexRed + 1] <= g[indexGreen + 1]) {
+                indexRed++;
+            } else if (indexRed < nr - 1 && indexGreen < ng - 1) {
+                indexGreen++;
+            } else if (indexRed < nr - 1 && indexGreen == ng - 1) {
+                indexRed++;
+            } else if (indexGreen < ng - 1 && indexRed == nr - 1) {
+                indexGreen++;
+            }
+
+        } else if (r[indexRed] <= g[indexGreen] && r[indexRed] <= b[indexBlue] && b[indexBlue] <= g[indexGreen]) {
+            if (indexRed == nr - 1 && indexBlue == nb - 1) {
+                break;
+            }
+            if (indexRed < nr - 1 && (r[indexRed + 1] <= b[indexBlue] || r[indexRed + 1] <= g[indexGreen])) {
+                indexRed++;
+            } else if (indexBlue < nb - 1 && (b[indexBlue + 1] <= g[indexGreen])) {
+                indexBlue++;
+            } else if (indexRed < nr - 1 && indexBlue < nb - 1 && r[indexRed + 1] <= b[indexBlue + 1]) {
+                indexRed++;
+            } else if (indexRed < nr - 1 && indexBlue < nb - 1) {
+                indexBlue++;
+            } else if (indexRed < nr - 1 && indexBlue == nb - 1) {
+                indexRed++;
+            } else if (indexBlue < nb - 1 && indexRed == nr - 1) {
+                indexBlue++;
+            }
+        } else if (g[indexGreen] <= r[indexRed] && g[indexGreen] <= b[indexBlue] && r[indexRed] <= b[indexBlue]) {
+            if (indexRed == nr - 1 && indexGreen == ng - 1) {
+                break;
+            }
+            if (indexGreen < ng - 1 && (g[indexGreen + 1] <= r[indexRed] || g[indexGreen + 1] <= b[indexBlue])) {
+                indexGreen++;
+            } else if (indexRed < nr - 1 && (r[indexRed + 1] <= b[indexBlue])) {
+                indexRed++;
+            } else if (indexGreen < ng - 1 && indexRed < nr - 1 && g[indexGreen + 1] <= r[indexRed + 1]) {
+                indexGreen++;
+            } else if (indexGreen < ng - 1 && indexRed < nr - 1) {
+                indexRed++;
+            } else if (indexRed < nr - 1 && indexGreen == ng - 1) {
+                indexRed++;
+            } else if (indexGreen < ng - 1 && indexRed == nr - 1) {
+                indexGreen++;
+            }
+        } else if (g[indexGreen] <= r[indexRed] && g[indexGreen] <= b[indexBlue] && b[indexBlue] <= r[indexRed]) {
+            if (indexBlue == nb - 1 && indexGreen == ng - 1) {
+                break;
+            }
+            if (indexGreen < ng - 1 && (g[indexGreen + 1] <= b[indexBlue] || g[indexGreen + 1] <= r[indexRed])) {
+                indexGreen++;
+            } else if (indexBlue < nb - 1 && (b[indexBlue + 1] <= r[indexRed])) {
+                indexBlue++;
+            } else if (indexGreen < ng - 1 && indexBlue < nb - 1 && g[indexGreen + 1] <= b[indexBlue + 1]) {
+                indexGreen++;
+            } else if (indexGreen < ng - 1 && indexBlue < nb - 1) {
+                indexBlue++;
+            } else if (indexBlue < nb - 1 && indexGreen == ng - 1) {
+                indexBlue++;
+            } else if (indexGreen < ng - 1 && indexBlue == nb - 1) {
+                indexGreen++;
+            }
+        } else if (b[indexBlue] <= g[indexGreen] && b[indexBlue] <= r[indexRed] && g[indexGreen] <= r[indexRed]) {
+            if (indexBlue == nb - 1 && indexGreen == ng - 1) {
+                break;
+            }
+            if (indexBlue < nb - 1 && (b[indexBlue + 1] <= g[indexGreen] || b[indexBlue + 1] <= r[indexRed])) {
+                indexBlue++;
+            } else if (indexGreen < ng - 1 && (g[indexGreen + 1] <= r[indexRed])) {
+                indexGreen++;
+            } else if (indexBlue < nb - 1 && indexGreen < ng - 1 && b[indexBlue + 1] <= g[indexGreen + 1]) {
+                indexBlue++;
+            } else if (indexGreen < ng - 1 && indexBlue < nb - 1) {
+                indexGreen++;
+            } else if (indexBlue < nb - 1 && indexGreen == ng - 1) {
+                indexBlue++;
+            } else if (indexGreen < ng - 1 && indexBlue == nb - 1) {
+                indexGreen++;
+            }
+        } else if (b[indexBlue] <= g[indexGreen] && b[indexBlue] <= r[indexRed] && r[indexRed] <= g[indexGreen]) {
+            if (indexBlue == nb - 1 && indexRed == nr - 1) {
+                break;
+            }
+            if (indexBlue < nb - 1 && (b[indexBlue + 1] <= r[indexRed] || b[indexBlue + 1] <= g[indexGreen])) {
+                indexBlue++;
+            } else if (indexRed < nr - 1 && (r[indexRed + 1] <= g[indexGreen])) {
+                indexRed++;
+            } else if (indexBlue < nb - 1 && indexRed < nr - 1 && b[indexBlue + 1] <= r[indexRed + 1]) {
+                indexBlue++;
+            } else if (indexRed < nr - 1 && indexBlue < nb - 1) {
+                indexRed++;
+            } else if (indexBlue < nb - 1 && indexRed == nr - 1) {
+                indexBlue++;
+            } else if (indexRed < nr - 1 && indexBlue == nb - 1) {
+                indexRed++;
+            }
+        }
+    }
+    return ans;
+}
+
+
+int main() {
+    fstream fin;
+    fstream fout;
+    fin.open("input.txt", ios::in);
+    fout.open("output.txt", ios::out);
+
+    if (fin.is_open()) {
+        int t;
+        fin >> t;
+        while (t--) {
+            int nr, ng, nb;
+            fin >> nr >> ng >> nb;
+
+            int *r = new int[nr];
+            int *g = new int[ng];
+            int *b = new int[nb];
+            for (int i = 0; i < nr; ++i)
+                fin >> r[i];
+            for (int i = 0; i < ng; ++i)
+                fin >> g[i];
+            for (int i = 0; i < nb; ++i)
+                fin >> b[i];
+
+            int *ans = solve(nr, ng, nb, r, g, b);
+
+            fout << ans[0] << ' ' << ans[1] << ' ' << ans[2] << endl;
+
+            delete[] r;
+            delete[] g;
+            delete[] b;
+            delete[] ans;
+        }
+    }
+    fin.close();
+    fout.close();
+    return 0;
+}
+
+
+
